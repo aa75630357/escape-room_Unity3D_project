@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b6cbe64b28479c949a1586b8eabb42ff, type: 3}
+  m_Name: paper2_Item
+  m_EditorClassIdentifier: Assembly-CSharp::ItemData
+  itemName: 'paper : '
+  itemDescription: Paper with something scribbled on it
+  itemIcon: {fileID: 21300000, guid: 4c0cff3ff233bc845b0abc91267bbcac, type: 3}
