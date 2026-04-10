@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
-// 🔥 URP 特效專用命名空間
+//  URP 特效專用命名空間
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal; 
 
@@ -14,7 +14,7 @@ public class AwakeSequence : MonoBehaviour
     [Header("玩家控制閹割區")]
     public MonoBehaviour[] playerScriptsToDisable; 
 
-    // 🔥 修正：類別名稱不能有空格！
+    //  修正：類別名稱不能有空格！
     private Volume volume;
     private DepthOfField dof;
     private ChromaticAberration ca;
@@ -33,7 +33,7 @@ public class AwakeSequence : MonoBehaviour
         volume = GameObject.FindObjectOfType<Volume>();
         if(volume != null && volume.profile.TryGet(out dof) && volume.profile.TryGet(out ca))
         {
-            // 🔥 修正：Gaussian 模式下的模糊參數叫做 gaussianEnd
+            //  修正：Gaussian 模式下的模糊參數叫做 gaussianEnd
             dof.gaussianEnd.value = 1f;
             ca.intensity.value = 1f;
         }
@@ -55,7 +55,7 @@ public class AwakeSequence : MonoBehaviour
 
         // 【第二次眨眼】
         mySequence.Append(blackPanel.DOFade(0.3f, 0.7f).SetEase(Ease.InOutQuad));
-        // 🔥 修正為 gaussianEnd
+        //  修正為 gaussianEnd
         if(dof != null) mySequence.Join(DOTween.To(()=> dof.gaussianEnd.value, x=> dof.gaussianEnd.value = x, 5f, 0.7f)); 
         
         mySequence.AppendInterval(0.4f);
@@ -68,7 +68,7 @@ public class AwakeSequence : MonoBehaviour
         if(ca != null) mySequence.Join(DOTween.To(()=> ca.intensity.value, x=> ca.intensity.value = x, 0f, 1f));
 
         // 【視線清晰】 
-        // 🔥 修正為 gaussianEnd，將數值拉高讓畫面完全清晰
+        //  修正為 gaussianEnd，將數值拉高讓畫面完全清晰
         if(dof != null) mySequence.Append(DOTween.To(()=> dof.gaussianEnd.value, x=> dof.gaussianEnd.value = x, 100f, 2f));
         
         // --- 演出結束 ---
