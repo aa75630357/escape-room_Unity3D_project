@@ -16,10 +16,15 @@ public class HotbarManager : MonoBehaviour
     public Vector3 hidePosition = new Vector3(0, -100f, 0); // 3D物件的隱藏位置
     public float moveDuration = 0.3f;           // 3D物件順移時間
 
+    [Header("UI 滑動動畫設定")]
+    public RectTransform iconsContainer;      // 請在UI上把包裹4個Icon的父物件拖進來
+    public float uiTweenDuration = 0.15f;     // UI切換動畫時間
+
     private int currentPage = 0;                // 目前頁數
     private int currentSlot = 0;                // 目前選中格子（0~3）
     private int slotsPerPage = 4;               // 每頁幾格
-
+    private bool isUiAnimating = false;       // UI 動畫鎖
+    
     void Awake()    {Instance = this;}
     //初始化最一開始哪個亮預設第一格
     void Start()    {RefreshSelectOutline();}
@@ -29,16 +34,26 @@ public class HotbarManager : MonoBehaviour
     void HandScroll()           //滾輪控制
     {   //抓滾輪
         float scroll = Input.GetAxis("Mouse ScrollWheel");
-        //防呆
-        if(scroll == 0)return;
+        if (scroll == 0 || isUiAnimating) return; // 如果UI正在播動畫，先攔截輸入(防呆)
         HideCurrentItem();  //先關掉3D物件
+        //取得背包內物品總數
+        int totalItems = Inventory.Instance.GetItemCount();
+        if (totalItems == 0) return;            //防呆
         if(scroll < 0)
             //控制欄位 往下滾，選上一個 (目前哪一格+1)到下一格 餘數%為了不要超過格數
             currentSlot = (currentSlot + 1) % slotsPerPage;
         else
             //控制欄位 往上滾，選下一個 (目前哪一格-1)到下一格 +格數是為了到從0格到3格 餘數%為了不要超過格數
             currentSlot = (currentSlot - 1 + slotsPerPage) % slotsPerPage;
+        bool windowChanged = false; //判斷是否需要換頁
+
+        if (currentPage >= currentSlot + slotsPerPage)
+        {
+            
+        }
         RefreshSelectOutline();     //控制亮光
+
+
         ShowCurrentItem();          //開啟3D物件
     }
 
@@ -56,7 +71,7 @@ public class HotbarManager : MonoBehaviour
     public void ShowCurrentItem()      //顯示3D物件在手上
     {
         GameObject model = Inventory.Instance.GetItemModel(currentPage * slotsPerPage + currentSlot);
-        if (model == null || model == null) return;
+        if (model == null) return;
         //拿起時候關掉hit box
         model.GetComponent<Collider>().enabled = false;
         model.transform.SetParent(itemHolder);                           // 設為子物件跟著相機走
@@ -65,12 +80,19 @@ public class HotbarManager : MonoBehaviour
     void HideCurrentItem()      //隱藏3D物件在手上(移開)
     {
         GameObject model = Inventory.Instance.GetItemModel(currentPage * slotsPerPage + currentSlot);
-        if (model == null || model == null) return;
+        if (model == null) return;
         // 放下時候開啟hit box
-        model.GetComponent<Collider>().enabled = true;
         model.transform.SetParent(null);                             // 取消父子關係
-        model.transform.DOMove(hidePosition, moveDuration);          // 移回隱藏位置
-
+        Collider itemCollider = model.GetComponent<Collider>();
+        model.transform.DOMove(hidePosition, moveDuration)           // 移回隱藏位置
+        .OnComplete(() => 
+        {
+            // 等到 DOMove 完全走到 hidePosition 後，這個括號裡面的程式才會執行！
+            if(itemCollider != null) 
+            {
+                itemCollider.enabled = true; // 這時候開碰撞，就絕對碰不到玩家了
+            }
+        });
     }
 
     // 拾取物品後呼叫，更新2D圖示
